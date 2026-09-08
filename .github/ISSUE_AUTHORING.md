@@ -7,9 +7,9 @@ The goal is simple: **an agent should be able to open one issue, read it start t
 know whether it can begin, what to build, and how to tell when it is finished** — without
 reading the codebase first and without chasing links to other issues.
 
-Work is dispatched from issue #1. An agent told to "find the next task" reads #1's status board,
-takes the topmost `READY` row, and follows that issue. So the board and the issue must agree, and
-both must be readable without guesswork.
+Work is dispatched by **label**. An agent told to "find the next task" queries labels, not
+prose — see [Status labels](#status-labels) below. Issue #1's status board is a human-readable
+mirror of those labels, not the source of truth.
 
 ---
 
@@ -39,6 +39,72 @@ Issue #1 is the source of truth for decisions. Where anything here conflicts wit
 
 ---
 
+## Status labels
+
+**The label is the source of truth for an issue's status.** Not the issue body, and not #1's
+status board — both of those are mirrors, kept for humans reading at a glance.
+
+Labels are used this way for one concrete reason: a label change is atomic, while editing an
+issue body replaces the whole thing. Two agents updating a shared status board can silently
+clobber each other's work with no diff and no review. Two agents changing labels cannot. Label
+changes also show up in the issue timeline, so there is an audit trail; body edits hide in an
+edit history nobody reads.
+
+Exactly one status label on every issue, at all times.
+
+| Label | Meaning | What an agent does |
+|---|---|---|
+| `status-ready` | Dependencies met, decisions settled | Take it |
+| `status-needs-decision` | Open questions need the repository owner | Post recommendations as a comment, then stop. **Do not build.** A recommendation is not a decision |
+| `status-blocked` | Waiting on another issue, or not written yet | Skip |
+| `status-in-progress` | Claimed, with a pull request linked | Skip |
+| `status-done` | Merged | Skip |
+
+`status-needs-decision` is deliberately separate from `status-blocked` because the action
+differs — one means post and stop, the other means skip. Collapsing them makes an agent guess.
+
+`status-done` is kept even though a closed issue implies it, because "every issue carries exactly
+one status label" is a trivially checkable invariant, while "carries one unless closed" is not —
+and a closed issue still wearing `status-in-progress` is a silent lie.
+
+Hyphens rather than `status: ready` because GitHub search parses `label:status-ready` cleanly.
+`label:status:ready` risks being read as `label:status` plus junk, and `label:"status: ready"`
+needs quoting that agents get wrong.
+
+### Other label dimensions
+
+- `phase-0` … `phase-5` — see a roadmap slice without opening #1.
+- `needs-design` — the issue carries a Design brief. A designer agent's queue is
+  `label:needs-design label:status-ready`.
+- `type-decision` — records a decision rather than building something, like #2.
+
+### Picking up work
+
+1. Query `label:status-needs-decision`, ascending by issue number. For each that has **no
+   recommendations comment yet**: read it, post recommendations, move on. **Never change its
+   label** — only the repository owner clears `status-needs-decision`. Servicing one is not
+   claiming it; there is nothing to hold, because the agent cannot resolve it.
+2. Query `label:status-ready`, ascending by issue number. Take the topmost. Issue numbers track
+   phase order, which approximates dependency order, so this is usually right. To override, the
+   owner just names an issue directly.
+3. Verify its `Depends on` list — every dependency must be `status-done`. If not, comment saying
+   the label is wrong and move to the next candidate. Do not halt the whole queue over one bad
+   label.
+4. **Claim before writing any code:** swap `status-ready` to `status-in-progress` and comment
+   with the pull request link.
+5. Build only that issue.
+6. On merge: swap to `status-done`, close the issue, and refresh #1's board in the same pull
+   request.
+7. If nothing is ready: report the `status-needs-decision` queue and what has already been
+   recommended. Stop.
+
+**When a decision does get made** — in a session, in a comment thread, anywhere — write it into
+the issue and #1's decision log **before** any code is written. A decision that lives only in a
+session transcript is a decision that evaporates, which is the failure this whole structure
+exists to prevent.
+
+---
+
 ## The shape of an issue
 
 Not a rigid template. Skip what does not apply, add what does.
@@ -46,7 +112,7 @@ Not a rigid template. Skip what does not apply, add what does.
 ```
 # 1.4 — Transactions ledger
 
-Status:      BLOCKED | READY | IN PROGRESS | DONE
+Status:      restate the label here; the label is authoritative
 Phase:       1
 Depends on:  1.1 (#7), 1.2 (#8)   <- must match #1's board
 Blocks:      1.5, 2.2
@@ -80,24 +146,11 @@ Driver:      #1
 
 ### Status
 
-Put it on the first line. In a manual workflow this is the field the owner and the agent both
-check before anything starts, and it needs to be readable at a glance rather than inferred from
-prose buried three headings down.
+Restate the label's status on the issue's first line, so someone reading the body knows where
+they stand without checking the sidebar. **The label is authoritative** — if the two ever
+disagree, the label wins and the body is stale.
 
-Use exactly one of these, and use the same word on #1's status board:
-
-| Status | Meaning |
-|---|---|
-| `READY` | Dependencies met, decisions settled, an agent can start now |
-| `NEEDS DECISION` | Open questions need the repository owner. An agent may post recommendations but must not build |
-| `BLOCKED` | Waiting on another issue, or the issue is not written yet |
-| `IN PROGRESS` | Claimed, with a pull request link |
-| `DONE` | Finished and merged |
-
-`NEEDS DECISION` is deliberately separate from `BLOCKED` because the agent's action differs. One
-means post recommendations and stop; the other means skip. Collapsing them makes an agent guess.
-
-If `BLOCKED` or `NEEDS DECISION`, say what unblocks it on the same line.
+Say what unblocks it on the same line.
 
 ### Start here
 
@@ -183,10 +236,15 @@ in words instead: "see the Styling section of #1".
 reads it, and a confidently wrong spec is worse than a stub. Stubs are fine for anything not
 being worked soon: a title, a paragraph of intent, and a link to #1.
 
-**Keep the board and the issue in sync.** An agent picks work by reading #1's board, then
-verifies against the issue it links to. If the two disagree about status or dependencies, the
-agent is told to stop and report — which is correct, and also means a stale board halts work.
-Update both, in the same pull request.
+**Prefer the atomic edit to the shared document.** Status lives in labels rather than in #1's
+board because a label change touches one thing, while editing a shared body replaces the whole
+document and can silently lose someone else's work. The same reasoning applies to anything else
+several agents will update concurrently: find the operation that cannot clobber.
+
+**Interaction happens in the issue thread, not in a session.** An agent's questions go in as
+comments, so it does not matter whether a human, a schedule, or a webhook started it — the owner
+answers whenever, and the next agent reads the thread and continues. Design around that and
+dispatch mechanism stops mattering.
 
 **Real data beats placeholder data in any example.** `82.450.000 ₫` and `2,5 chỉ` are what this
 app actually handles. A spec written against `$1,234` produces work that breaks on contact with
