@@ -41,6 +41,20 @@ Service un-serviced `status-needs-decision` issues first — reading one and pos
 recommendations is cheap and unblocks whatever waits behind it, while building a ready feature
 is expensive and unblocks nothing. Then take the lowest-numbered `status-ready` issue.
 
+**Service every decision; build exactly one issue, then stop.** Report what you did and what is
+now ready, and do not pick up a second `status-ready` issue unless the owner asks. If two issues
+turn out to be genuinely inseparable — the same migration, the same component, work that cannot
+become two reviewable pull requests — ask rather than deciding for yourself.
+
+One issue per pull request keeps review tractable, these issues carry decisions the owner still
+owes an answer on, and a second feature built at the tail of a long session is built on degraded
+context. Being asked to do another costs one sentence; untangling two half-understood features
+costs an afternoon.
+
+If your tool can rename its own session, do — the Claude Code skill in `.claude/skills/next-task`
+documents the convention (`(status) #N - description`, where the status tells the owner whether
+the session is waiting on them). Skip it if your tool has no such concept.
+
 **The full algorithm** — dependency verification, claiming, what to do when nothing is ready —
 is in `.github/ISSUE_AUTHORING.md` under *Picking up work*. Read it before starting.
 

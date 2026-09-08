@@ -46,6 +46,92 @@ owner means they can answer a batch in one sitting instead of answer-one, wait, 
 Then take the lowest-numbered `status-ready` issue. Issue numbers track phase order, which
 approximates dependency order.
 
+## One issue per session
+
+Service **every** un-serviced decision — that pass is plural and read-only, and the point is
+getting the whole queue in front of the owner at once.
+
+Then build **exactly one** `status-ready` issue. When it is finished, stop and report what you
+did and what is now ready.
+
+**Do not pick up a second issue.** Three exceptions, and only these:
+
+- The owner explicitly asks you to take another one.
+- Two issues turn out to be genuinely entangled — the same migration, the same component, work
+  that cannot be split into two reviewable pull requests. **In that case ask** rather than
+  deciding for yourself. Say which issues, why they cannot be separated, and wait.
+- Your issue turns out to be already done, or a no-op. Say so and stop; do not fill the session
+  with substitute work.
+
+This is not caution for its own sake. One issue per pull request keeps review tractable. These
+issues carry decisions the owner still has to make, so rolling into a second one compounds any
+wrong assumption from the first before anyone has seen it. And a second feature built on the
+tail of a long session is built on degraded context — the part of the work most likely to be
+subtly wrong in a way that still passes its tests.
+
+Being asked to do another costs one sentence. Untangling two half-understood features costs an
+afternoon.
+
+## Name the session
+
+A session called "Next task" is useless in a list of ten. Rename it so the owner can see at a
+glance what each session is doing and, more importantly, **which ones are waiting on them.**
+
+**Rename once you have read the issue and understand it** — not before. A name guessed from the
+label alone is barely better than the default.
+
+**Format:**
+
+```
+({status}) #{number} - {brief description}
+```
+
+Examples:
+
+```
+(reading)  #9 - Price data terms review
+(building) #13 - Transactions ledger
+(asking)   #11 - Quotes schema
+(review)   #4 - CLAUDE.md conventions
+(done)     #4 - CLAUDE.md conventions
+```
+
+Keep the description short enough to survive truncation in a session list. The status and the
+number are the parts that must always be visible.
+
+**The five statuses:**
+
+| Status | You are | Owner needs to act? |
+|---|---|---|
+| `reading` | Orienting on the issue. Nothing changed yet | No |
+| `building` | Implementing. Code in flight | No |
+| `asking` | **Stalled on an answer from the owner** | **Yes** |
+| `review` | Pull request pushed, awaiting review | **Yes** |
+| `done` | Merged or closed | No |
+
+**Rename on every transition**, not just at the start. The status is only useful if it is
+current — a session that says `building` while it has actually been waiting three hours for an
+answer is worse than no status at all, because it teaches the owner not to trust the list.
+
+`asking` is the important one. It is the only state where nothing will happen until the owner
+replies, and it can sit there indefinitely. Use it the moment you post a question and stop
+working — including when you post recommendations on a `status-needs-decision` issue.
+
+There is deliberately no `blocked`. A mid-session block is almost always "needs the owner", which
+is `asking`; a genuine dependency block should have been caught before you started.
+
+**These are not the GitHub label names.** The labels describe the *issue's* state. These describe
+*this session's* state working on it. An issue can be `status-in-progress` while this session
+sits in `review`.
+
+**Sessions that are not working an issue** — setup, discussion, research with no issue attached —
+get a plain descriptive title with a parenthetical that fits, and no issue number. For example:
+`(setup) Project driver, issues, and agent workflow`.
+
+**How:** call `get_session` with no arguments to get this session's own id, then
+`set_session_title`. If neither tool exists in your environment, skip renaming and say so once —
+it is a convenience, not a requirement, and not every tool exposes it.
+
 ## Commands
 
 Either the `gh` CLI or the GitHub MCP tools work. Use whichever this session has — check before

@@ -95,8 +95,20 @@ needs quoting that agents get wrong.
 5. Build only that issue.
 6. On merge: swap to `status-done`, close the issue, and refresh #1's board in the same pull
    request.
-7. If nothing is ready: report the `status-needs-decision` queue and what has already been
+7. **Then stop. One issue per session.** Report what you did and what is now ready. Do not
+   pick up another `status-ready` issue unless the owner asks. If two issues turn out to be
+   genuinely inseparable — the same migration, the same component, work that cannot become two
+   reviewable pull requests — **ask** rather than deciding for yourself.
+8. If nothing is ready: report the `status-needs-decision` queue and what has already been
    recommended. Stop.
+
+**Why one at a time.** Servicing decisions is plural — it is cheap, read-only, and getting the
+whole queue in front of the owner in one pass is the point. Building is singular, for three
+reasons: one issue per pull request keeps review tractable; these issues carry decisions the
+owner has to make, so barrelling into a second one compounds any wrong assumption from the
+first; and a second issue built on the tail of a long session is built on degraded context. The
+owner can always say "now do another" — that costs one sentence. Unwinding two entangled
+features costs an afternoon.
 
 **When a decision does get made** — in a session, in a comment thread, anywhere — write it into
 the issue and #1's decision log **before** any code is written. A decision that lives only in a
