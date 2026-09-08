@@ -89,6 +89,28 @@ a missed poll and a flat market become indistinguishable and the gap is permanen
 
 ---
 
+## Branching
+
+`main` is the trunk. **Never commit directly to it** — not even for a one-line fix. Review is
+where a wrong assumption gets caught, and a direct commit skips it silently.
+
+Work on a branch per issue, named `issue-<number>-<short-slug>` (`issue-11-quotes-schema`), and
+open a pull request against `main`. One pull request per issue.
+
+*Exception:* if your session was launched with a branch already designated for you, use that one
+and name the issue in the pull request instead.
+
+The pull request carries the code, the issue's label swapped to `status-done`, issue #1's board
+row updated, and any decision that got made — all in the same change. Shipping code and leaving
+the label stale means the next agent picks up work that is already finished.
+
+Do not rewrite history on a branch you have already pushed; add a commit instead. Delete the
+branch after merge.
+
+Full detail in `.github/ISSUE_AUTHORING.md` under *Branching and pull requests*.
+
+---
+
 ## Working conventions
 
 - **Do the issue you were given, and nothing beyond it.** Anything you notice outside that scope

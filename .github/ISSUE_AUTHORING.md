@@ -117,6 +117,49 @@ exists to prevent.
 
 ---
 
+## Branching and pull requests
+
+`main` is the trunk. Every issue's work happens on its own branch and arrives through a pull
+request.
+
+**Never commit directly to `main`.** Not for a one-line fix, not for a doc typo. The review step
+is where a wrong assumption gets caught, and the whole point of writing the issues the way we do
+is that someone reads the result against them. A commit straight to `main` skips that silently.
+
+**Branch naming:** `issue-<number>-<short-slug>` — `issue-11-quotes-schema`,
+`issue-4-claude-md`. The number is what matters; it makes the branch, the issue, the pull
+request and the commit trailers all traceable to each other.
+
+*Exception:* if your session was launched with a branch already designated for you — some
+harnesses do this, with names like `claude/some-generated-name` — use the branch you were given
+rather than inventing one. An instruction from the session that started you wins over this
+convention. Say in the pull request which issue the work belongs to, since the branch name will
+not say it.
+
+**One pull request per issue.** This follows from one-issue-per-session: if you are building one
+issue, you produce one pull request.
+
+**What the pull request must carry**, all in the same change as the code:
+
+- The code.
+- The issue's status label swapped to `status-done`.
+- Issue #1's status board row updated.
+- Any decision that got made along the way, written into the issue and #1's decision log.
+
+Landing these together is what keeps the record and the work in step. A pull request that ships
+code and leaves the label stale means the next agent picks up work that is already done.
+
+**Commit messages reference the issue** as `tumble29/asset-price-profit-calculator#N`.
+
+**Do not rewrite history on a branch you have pushed.** Once it is on the remote someone — or
+some CI run — may be looking at it. Add a commit instead. On your own unpushed work, tidy up
+freely.
+
+**After merge**, delete the branch. A repository full of merged branches makes it hard to see
+what is actually in flight.
+
+---
+
 ## The shape of an issue
 
 Not a rigid template. Skip what does not apply, add what does.

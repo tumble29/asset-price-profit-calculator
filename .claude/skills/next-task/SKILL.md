@@ -169,6 +169,12 @@ gh issue edit <N> --repo tumble29/asset-price-profit-calculator \
 
 Then comment with your pull request link so the claim is visible in the timeline.
 
+**Branch before you build.** `main` is the trunk and nothing is committed directly to it. Create
+`issue-<number>-<short-slug>` off `main` — or use the branch your session was given, if it was
+given one — and open a pull request against `main`. The pull request carries the code, the label
+swap to `status-done`, and #1's board row update together. See *Branching and pull requests* in
+`.github/ISSUE_AUTHORING.md`.
+
 ## Verify dependencies before building
 
 Every issue lists `Depends on`. Each of those must be `status-done`. If one is not, the label
