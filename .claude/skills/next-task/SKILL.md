@@ -169,7 +169,10 @@ gh issue edit <N> --repo tumble29/asset-price-profit-calculator \
 
 Then comment with your pull request link so the claim is visible in the timeline.
 
-**Branch before you build.** `main` is the trunk and nothing is committed directly to it. Create
+**Branch before you build.** `main` is the trunk and nothing is committed directly to it. There
+is a driver-session exception documented in `.github/ISSUE_AUTHORING.md`, and **it does not apply
+to you** — if you got here by querying labels, you are doing issue work, which means a branch and
+a pull request. Create
 `issue-<number>-<short-slug>` off `main` — or use the branch your session was given, if it was
 given one — and open a pull request against `main`. The pull request carries the code, the label
 swap to `status-done`, and #1's board row update together. See *Branching and pull requests* in
