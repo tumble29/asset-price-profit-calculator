@@ -4,8 +4,9 @@ A vendor-neutral entry point. If your tool auto-discovers this file, you are in 
 place. If someone pointed you here manually, likewise.
 
 This repository is a free, open-source web app for tracking physical gold and silver holdings
-and showing honest profit and loss. Vietnam-first, international-capable. **It has no name
-yet** — the repository name is a placeholder.
+and showing honest profit and loss. Vietnam-first, international-capable. **The product is
+called iKhobau** (#2); `asset-price-profit-calculator` is still the repository name, not the
+product name.
 
 ---
 
