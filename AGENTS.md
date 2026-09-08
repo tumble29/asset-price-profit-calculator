@@ -59,7 +59,9 @@ the session is waiting on them). Skip it if your tool has no such concept.
 **The full algorithm** — dependency verification, claiming, what to do when nothing is ready —
 is in `.github/ISSUE_AUTHORING.md` under *Picking up work*. Read it before starting.
 
-Claude Code users: the `next-task` skill in `.claude/skills/` wraps this.
+Claude Code users: two skills in `.claude/skills/` wrap this — `next-task` when no issue has been
+named, `start-issue` when one has. Both defer to `.github/ISSUE_AUTHORING.md` for everything
+after issue selection, so the procedure exists in one place.
 
 ---
 
