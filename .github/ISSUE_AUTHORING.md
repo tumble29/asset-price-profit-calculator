@@ -126,31 +126,6 @@ request.
 is where a wrong assumption gets caught, and the whole point of writing the issues the way we do
 is that someone reads the result against them. A commit straight to `main` skips that silently.
 
-### The one exception: a driver session
-
-A **driver session** may commit to `main` directly. It is the session where the repository owner
-and an agent work on the project's scaffolding together — this file, `AGENTS.md`, `CLAUDE.md`,
-the driver issue, the conventions, the issue set itself. Review is not skipped there; it is
-happening live, in the conversation, sentence by sentence.
-
-**You are a driver session only if both of these hold:**
-
-1. The repository owner is present in the conversation, steering it turn by turn.
-2. What you are changing is **process artifacts, not the application** — docs, conventions,
-   issues, labels, skills.
-
-The moment the change would touch application code, a migration, a component, a test, or
-anything an issue owns, it is *work* — and work goes on a branch and through a pull request, in
-the same session or a different one.
-
-**Default to assuming you are not a driver session.** In particular: **an agent that found its
-task by querying labels is never a driver session**, no matter what else it was told. Being
-dispatched to an issue is the definition of doing work.
-
-The session title convention reflects this — a driver session is titled descriptively, like
-`(setup) Project driver, issues, and agent workflow`, with no issue number. A session titled
-`(building) #13 - …` is not a driver session.
-
 **Branch naming:** `issue-<number>-<short-slug>` — `issue-11-quotes-schema`,
 `issue-4-claude-md`. The number is what matters; it makes the branch, the issue, the pull
 request and the commit trailers all traceable to each other.

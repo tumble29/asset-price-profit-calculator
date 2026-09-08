@@ -94,15 +94,6 @@ a missed poll and a flat market become indistinguishable and the gap is permanen
 `main` is the trunk. **Never commit directly to it** — not even for a one-line fix. Review is
 where a wrong assumption gets caught, and a direct commit skips it silently.
 
-**One exception: a driver session**, where the owner and an agent work on the project's
-scaffolding together — docs, conventions, issues, labels. Review is not skipped there, it is
-happening live in the conversation. That requires both the owner present and steering, *and* the
-change being process artifacts rather than the application. Anything touching app code, a
-migration, a component or a test is work, and work goes through a branch and a pull request.
-
-**Assume you are not a driver session.** An agent that found its task by querying labels never
-is — being dispatched to an issue is the definition of doing work.
-
 Work on a branch per issue, named `issue-<number>-<short-slug>` (`issue-11-quotes-schema`), and
 open a pull request against `main`. One pull request per issue.
 
