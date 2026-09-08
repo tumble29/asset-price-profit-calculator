@@ -1,8 +1,10 @@
-# Asset Price Profit Calculator
+# iKhobau
 
-> **Working title.** The product name is not decided — see
-> [issue #2](https://github.com/tumble29/asset-price-profit-calculator/issues/2).
-> `asset-price-profit-calculator` is the repository name, not the app name.
+> **The product is called iKhobau.** Decided in
+> [issue #2](https://github.com/tumble29/asset-price-profit-calculator/issues/2), which records
+> the reasoning and the 34 candidates rejected before it.
+> `asset-price-profit-calculator` is still the repository name, not the app name; renaming the
+> repository is cosmetic and can wait.
 
 Track the gold and silver you actually own, and see what it is worth today — valued at the
 price you could actually sell it for, not the one that flatters.
@@ -229,17 +231,14 @@ project's **driver issue** — a single tracking issue that indexes every featur
 records every decision along with the reasoning behind it. That is the place to look for
 current state; this file will go stale faster than that one does.
 
-> **Driver issue:** [#1 — Assay — Project Driver](https://github.com/tumble29/asset-price-profit-calculator/issues/1)
+> **Driver issue:** [#1 — Project Driver](https://github.com/tumble29/asset-price-profit-calculator/issues/1)
 
 ---
 
 ## Open questions
 
-- **Product name and domain.** Open. Tracked in
-  [issue #2](https://github.com/tumble29/asset-price-profit-calculator/issues/2), which records
-  the candidates screened so far and why each was rejected.
-- **Repository name.** Still `asset-price-profit-calculator`. Renaming it is cosmetic and can
-  wait.
+- **Repository name.** Still `asset-price-profit-calculator`. Renaming it to match the product
+  name is cosmetic and can wait.
 - **Price data source.** FHSC API is the current intent, pending a look at its coverage,
   terms, and whether it provides both sides of the dealer quote.
 - **Whether prices can be shown publicly.** Depends on the data provider's terms, and gates the
