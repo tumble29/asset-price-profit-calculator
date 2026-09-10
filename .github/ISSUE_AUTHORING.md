@@ -102,20 +102,32 @@ unblocks nothing anyone is waiting on.
 Once you know which issue you are on — whether you found it or were handed it — this is the
 procedure. It is the same either way.
 
-1. **Read the issue start to finish.** It carries its own binding constraints, scope and
-   acceptance criteria. Do not skim to the first actionable line.
-2. **Verify its `Depends on` list.** Every dependency must be `status-done`. If one is not, say
-   so and stop; if you were choosing your own work, move to the next candidate instead. **Do not
-   halt the whole queue over one bad label** — one stale row should cost you one candidate, not
-   the session.
-3. **Claim it before writing any code.** Swap `status-ready` to `status-in-progress` and comment
-   on the issue. An unclaimed task can be picked up twice.
-4. **Branch.** See *Branching and pull requests* below. Nothing is committed directly to `main`.
-5. **Name your session.** See *Naming your session* below.
-6. **Build only that issue**, and stop when it is done. Report what you did and what is now
-   ready.
-7. **Finish in one pull request:** the code, the label swapped to `status-done`, issue #1's
-   board row updated, and any decision that got made. Then close the issue.
+Each step says what your session should be called at that point. Renaming is part of the step,
+not a separate chore to remember — a title that stops updating is worse than no title, because it
+tells the owner something false.
+
+| Step | Do | Session title |
+|---|---|---|
+| 1 | **Read the issue start to finish.** It carries its own binding constraints, scope and acceptance criteria. Do not skim to the first actionable line. | `(reading) #N - …` |
+| 2 | **Verify its `Depends on` list.** If a dependency is not finished, say so and stop; if you were choosing your own work, move to the next candidate instead. **Do not halt the whole queue over one bad label** — one stale row should cost you one candidate, not the session. | `(reading)` |
+| 3 | **Claim it before writing any code.** Swap `status-ready` to `status-in-progress` and comment on the issue. An unclaimed task can be picked up twice. | `(reading)` |
+| 4 | **Branch.** See *Branching and pull requests* below. Nothing is committed directly to `main`. | `(reading)` |
+| 5 | **Build only that issue.** | **`(building) #N - …`** |
+| 6 | **Open the pull request** — the code, issue #1's board row, and any decision that got made, in one change. Put `Closes #N` in the body so the issue closes on merge. Then **stop and report.** Do not merge yet. | **`(review) #N - …`** |
+| 7 | **When the owner says to merge** — merge it, swap the label to `status-done`, and confirm the issue closed. | **`(done) #N - …`** |
+
+At any point, if you post a question and stop working, the title becomes **`(asking) #N - …`**
+immediately. That is the only state where nothing happens until the owner replies, so it is the
+one that most needs to be visible.
+
+**The label goes to `status-done` on merge, not when the pull request opens.** Step 2's
+dependency check is about work that is actually on `main`; an issue labelled done while its pull
+request is still open would let the next agent build against code that does not exist yet.
+
+**Never merge your own pull request unasked.** Stopping at step 6 is what gives the owner a
+chance to read the diff — it is the only review this project has. Merge when they tell you to,
+and not before. If they have not replied, the session sits at `(review)`, which is exactly what
+that status is for.
 
 **One issue per session.** Do not pick up a second. Three exceptions, and only these:
 

@@ -49,8 +49,8 @@ pointed at one issue; stay on it.
 
 ## Then follow the standard procedure
 
-Everything else — verifying dependencies, claiming, branching, naming the session, building, and
-finishing in one pull request that carries the code plus the label swap plus #1's board row — is
+Everything else — verifying dependencies, claiming, branching, naming the session as you move
+through it, building, opening the pull request, and merging once the owner says so — is
 *Working an issue* in `.github/ISSUE_AUTHORING.md`. Follow it there.
 
 **One issue per session** still applies. Finishing the named issue is the end of the session's
