@@ -17,7 +17,7 @@ product name.
 | **Issue #1** — `tumble29/asset-price-profit-calculator#1` | What is the state of the project, what has been decided, and what is still open |
 | `README.md` | What the product is, for a human arriving cold |
 | `.github/ISSUE_AUTHORING.md` | How work is picked up, and how an issue is written |
-| `CLAUDE.md` | Code conventions. **Does not exist yet** — tracked as issue #4 |
+| `CLAUDE.md` | Code conventions — how to write code in this repository |
 
 **Issue #1 is the source of truth for decisions.** Where anything else disagrees with it, #1
 wins and the other document is stale.
@@ -103,9 +103,11 @@ open a pull request against `main`. One pull request per issue.
 *Exception:* if your session was launched with a branch already designated for you, use that one
 and name the issue in the pull request instead.
 
-The pull request carries the code, the issue's label swapped to `status-done`, issue #1's board
-row updated, and any decision that got made — all in the same change. Shipping code and leaving
-the label stale means the next agent picks up work that is already finished.
+The pull request carries the code, issue #1's board row, and any decision that got made — all in
+the same change. Put `Closes #N` in the body. **Do not merge it yourself and do not swap the
+label to `status-done` when it opens** — that happens on merge, once the owner has said so.
+An issue marked done while its pull request is still open lets the next agent build against code
+that is not on `main` yet.
 
 Do not rewrite history on a branch you have already pushed; add a commit instead. Delete the
 branch after merge.
@@ -116,9 +118,15 @@ Full detail in `.github/ISSUE_AUTHORING.md` under *Branching and pull requests*.
 
 ## Working conventions
 
-- **Do the issue you were given, and nothing beyond it.** Anything you notice outside that scope
-  goes in a comment. Do not silently fix it, and do not silently skip it — a silent fix buries
-  the real change in review noise, and a silent skip means only you ever knew.
+- **Explore widely, report freely, change narrowly.** The limit is on what you change unasked —
+  never on what you may read, notice or propose.
+- **Raise what you spot in the session, and propose the fix — do not just point at it.** Small,
+  and in code this issue already touches: say what you would do, and ask whether to fold it in.
+  Anything with its own acceptance criteria: propose it as a new issue. The owner decides. Never
+  silently fix it and never silently skip it — a silent fix buries the real change in review
+  noise, and a silent skip means only you ever knew.
+- **Before finishing, write down anything raised and still unanswered.** The session is where the
+  owner reads it; a comment on the issue is what survives the session ending.
 - **If something is ambiguous, or reality does not match the issue** — a tool behaves
   differently, a version has moved on, a documented step does not work — say so and stop.
   Guessing is the expensive option here.
