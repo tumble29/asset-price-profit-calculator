@@ -379,8 +379,8 @@ what not to do" prevents an agent inventing a visual pattern that everything aft
 
 Everything in acceptance criteria, plus the housekeeping that is otherwise forgotten: update
 #1's status board in the same pull request as the code, record any decision that got made, and
-raise anything noticed outside scope as a comment rather than silently fixing or silently
-skipping it.
+raise anything noticed outside scope — with the fix you would make — rather than silently fixing
+or silently skipping it.
 
 ---
 
@@ -409,10 +409,12 @@ board because a label change touches one thing, while editing a shared body repl
 document and can silently lose someone else's work. The same reasoning applies to anything else
 several agents will update concurrently: find the operation that cannot clobber.
 
-**Interaction happens in the issue thread, not in a session.** An agent's questions go in as
-comments, so it does not matter whether a human, a schedule, or a webhook started it — the owner
-answers whenever, and the next agent reads the thread and continues. Design around that and
-dispatch mechanism stops mattering.
+**Raise things in the session; leave the thread as the record.** Questions and observations go
+to whoever is in the session, because that is where they actually get read — a comment nobody
+opens is the same as saying nothing. Anything still unanswered when the session ends goes into
+the issue thread, so a run started by a schedule or a webhook with nobody watching still leaves
+its questions where the next agent finds them. The thread is the archive, not the notification;
+design around that and dispatch mechanism stops mattering.
 
 **Real data beats placeholder data in any example.** `82.450.000 ₫` and `2,5 chỉ` are what this
 app actually handles. A spec written against `$1,234` produces work that breaks on contact with
