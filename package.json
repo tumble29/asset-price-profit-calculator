@@ -1,0 +1,32 @@
+{
+  "name": "ikhobau",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Track the gold and silver you actually own, valued at the price you could sell it for.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @ikhobau/web dev",
+    "build": "pnpm --filter @ikhobau/web build",
+    "start": "pnpm --filter @ikhobau/web start",
+    "typecheck": "pnpm --filter @ikhobau/web typecheck",
+    "lint": "biome check . && pnpm run lint:stylesheets && pnpm run lint:migrations",
+    "lint:fix": "biome check --write . && pnpm run lint:stylesheets && pnpm run lint:migrations",
+    "lint:stylesheets": "node scripts/check-stylesheets.mjs",
+    "test": "pnpm --filter @ikhobau/web test",
+    "test:e2e": "pnpm --filter @ikhobau/web test:e2e",
+    "supabase": "supabase",
+    "db:pull": "drizzle-kit pull --config db/drizzle.config.ts",
+    "lint:migrations": "node scripts/check-migrations-single-source.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.13",
+    "drizzle-kit": "0.31.10",
+    "drizzle-orm": "0.45.2",
+    "postgres": "3.4.9",
+    "supabase": "2.117.0"
+  }
+}
