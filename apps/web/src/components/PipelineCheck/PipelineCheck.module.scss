@@ -1,0 +1,33 @@
+/*
+ * The `@reference` is load-bearing and must be this exact form.
+ *
+ * `#globals.css` is a package.json `imports` subpath, so the line is identical
+ * at every directory depth. The tsconfig `@/` alias does NOT work here —
+ * Tailwind resolves with enhanced-resolve, which treats `@/…` as a bare
+ * package — and a relative path would break the moment the file moves.
+ *
+ * Bare `@reference "tailwindcss"` compiles green while resolving none of this
+ * project's tokens. `pnpm lint` rejects both that and a missing reference,
+ * because the build does not: a module using only theme-independent utilities
+ * compiles byte-identically with no reference at all.
+ */
+@reference "#globals.css";
+
+.pipelineCheck {
+  @apply flex flex-col;
+  /* `gap-gutter` comes from --spacing-gutter in globals.css. If the reference
+   * above is wrong, this is the line that fails — a project token cannot
+   * resolve from Tailwind's defaults. */
+  @apply gap-gutter p-gutter;
+
+  /* Nesting, a variant and a pseudo-class, all inside @apply — the three
+   * things issue #3 asked this component to prove. */
+  .heading {
+    @apply text-lg font-medium underline;
+    @apply hover:no-underline;
+  }
+
+  .body {
+    @apply max-w-prose leading-relaxed;
+  }
+}

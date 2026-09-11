@@ -1,0 +1,32 @@
+/*
+ * The one global stylesheet.
+ *
+ * Deliberately `.css` and not `.scss`. It needs no Sass, and making it `.scss`
+ * costs a Dart Sass `@import` deprecation warning on every build for a feature
+ * slated for removal in Dart Sass 3.0. Component styles are `*.module.scss`.
+ *
+ * `@theme static`, never bare `@theme`. Bare `@theme` tree-shakes a token out
+ * of `:root` when the only consumer is hand-written `var()` inside a module:
+ * this file and each module are separate Tailwind compilation units, so the
+ * pass over this file cannot see that usage. `static` forces emission.
+ *
+ * Never nest `@theme` inside a selector. It builds with exit 0 and no warning,
+ * discards the selector, hoists the variable to `:root`, and silently
+ * overwrites whatever was there. Dark mode is therefore a plain-CSS override
+ * of these tokens, not a nested `@theme` — 0.5 (#7) builds that layer.
+ *
+ * No colour is defined here. There are no colour tokens yet; 0.5 (#7) owns
+ * them, and until then a colour literal is forbidden everywhere.
+ */
+
+@import "tailwindcss";
+
+@theme static {
+  /*
+   * One non-colour token, so that 0.1 actually proves what it claims to: a
+   * token declared here, resolved through `@reference` inside a co-located
+   * module, and consumed via `@apply`. Without a custom token the pipeline
+   * would compile using only Tailwind's defaults and prove nothing.
+   */
+  --spacing-gutter: 1.5rem;
+}

@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next
+.next/
+out/
+next-env.d.ts
+
+# typescript incremental build state
+*.tsbuildinfo
+
+# test artefacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# supabase
+# `supabase init` writes supabase/.gitignore for .branches/.temp/.env.keys.
+# `.supabase/` is a *project-root sibling* holding link state (project.json,
+# local-versions.json) that supabase init does not cover.
+.supabase/
+
+# env
+.env
+.env.local
+.env*.local
+
+# editors / os
+.DS_Store
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# signing material must never be committed
+claude-code-signing*

@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # Biome, plus the two checks it cannot do: Biome does not parse SCSS at
+      # all, and a missing Tailwind `@reference` does not reliably fail the
+      # build. See scripts/check-stylesheets.mjs.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test
+
+      # A full `next build` on Turbopack. This is the only thing that catches
+      # the Tailwind/CSS-Modules purity failure, so it stays in CI even though
+      # #3 scoped CI to typecheck, lint and unit tests.
+      - name: Build
+        run: pnpm build
+        env:
+          # Placeholders. The build only needs these to be present — src/lib/env.ts
+          # fails at startup naming any that are missing, which is the behaviour
+          # #3's acceptance criteria require.
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+
+      # `next build` rewrites tsconfig.json on its first run in a fresh tree.
+      # Both it and next-env.d.ts are committed or ignored deliberately, so a
+      # dirty tree here means something regenerated differently than expected.
+      - name: Working tree is clean after build
+        run: git diff --exit-code

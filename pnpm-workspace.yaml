@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+
+# These packages run install scripts that they genuinely need, and pnpm 10
+# refuses unapproved build scripts. Left unapproved, a clean clone warns today
+# and can fail with ERR_PNPM_IGNORED_BUILDS depending on configuration.
+#
+#   @parcel/watcher  arrives under `sass`, builds a native watcher
+#   esbuild          arrives under `drizzle-kit`, fetches its platform binary
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
