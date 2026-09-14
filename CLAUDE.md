@@ -69,7 +69,8 @@ common utility — Tailwind's `@property` fallback block is not a pure CSS-Modul
 
 **`pnpm lint` is not just Biome.** Biome cannot parse SCSS at all, so without
 `scripts/check-stylesheets.mjs` every component stylesheet would go unchecked — including the
-colour-literal and semantic-token rules below. That script also catches the one Tailwind failure
+colour-literal and `@theme static` rules below. Semantic token *naming* stays a human rule; no
+tool checks it. That script also catches the one Tailwind failure
 that is silent: a `*.module.scss` using only theme-independent utilities compiles byte-identically
 with **no `@reference` at all**, and bare `@reference "tailwindcss"` compiles green while
 resolving none of this project's tokens. Both merge green and break a later pull request.

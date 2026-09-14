@@ -13,14 +13,15 @@
     "build": "pnpm --filter @ikhobau/web build",
     "start": "pnpm --filter @ikhobau/web start",
     "typecheck": "pnpm --filter @ikhobau/web typecheck",
-    "lint": "biome check . && pnpm run lint:stylesheets && pnpm run lint:migrations",
-    "lint:fix": "biome check --write . && pnpm run lint:stylesheets && pnpm run lint:migrations",
+    "lint": "node scripts/lint.mjs",
+    "lint:fix": "biome check --write . && node scripts/lint.mjs",
     "lint:stylesheets": "node scripts/check-stylesheets.mjs",
     "test": "pnpm --filter @ikhobau/web test",
     "test:e2e": "pnpm --filter @ikhobau/web test:e2e",
     "supabase": "supabase",
     "db:pull": "drizzle-kit pull --config db/drizzle.config.ts",
-    "lint:migrations": "node scripts/check-migrations-single-source.mjs"
+    "lint:migrations": "node scripts/check-migrations-single-source.mjs",
+    "test:e2e:install": "pnpm --filter @ikhobau/web test:e2e:install"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.13",

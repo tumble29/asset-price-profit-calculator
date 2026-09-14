@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
 /**
@@ -11,11 +12,19 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    // Both directories, both extensions, both suffixes. A narrower glob is
+    // silent rather than loud: a `.test.tsx`, or a test colocated under src/,
+    // simply never runs and `pnpm test` still reports green. The glob is scoped
+    // to these two directories so Playwright's `e2e/*.spec.ts` stays out —
+    // Vitest's defaults would pick those up and fail.
+    include: ['{src,tests}/**/*.{test,spec}.{ts,tsx}'],
   },
   resolve: {
     alias: {
-      '@': new URL('./src/', import.meta.url).pathname,
+      // fileURLToPath, not URL.pathname: pathname is percent-encoded, so a
+      // checkout under "~/My Projects/" resolves to a path with %20 in it and
+      // the alias fails with a misleading "Cannot find package" error.
+      '@': fileURLToPath(new URL('./src/', import.meta.url)),
     },
   },
 })

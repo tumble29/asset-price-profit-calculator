@@ -38,9 +38,10 @@ anyone's assets or money — the app stores records of what you say you own, and
 
 ## Status
 
-**Scaffolded, no features yet.** The repository builds, tests and deploys; it does not do
-anything a user would want. 0.1 landed the toolchain — see [Getting started](#getting-started).
-The first feature issue is 1.1 (the `instruments` table).
+**Scaffolded, no features yet.** The repository builds and tests; it does not do anything a
+user would want. 0.1 landed the toolchain — see [Getting started](#getting-started). Hosting is
+not wired up: no Vercel project is linked, so there are no preview deployments yet. The first
+feature issue is 1.1 (the `instruments` table).
 
 Live progress, the current roadmap, and every technical decision (made or deferred) are tracked
 in the project's driver issue — see [Project tracking](#project-tracking).
@@ -228,11 +229,16 @@ pnpm install
 pnpm supabase start            # local Postgres, auth and Studio; needs Docker
 cp .env.example .env.local     # then paste in the values `supabase start` printed
 
+pnpm test:e2e:install          # once, for the Playwright browser
 pnpm dev                       # http://localhost:3000
 ```
 
-The app refuses to start if a required environment variable is missing, and the error names it.
-`.env.example` lists every one. No real credential ever belongs in the repository.
+`.env.local` stays at the repository root. `apps/web/next.config.ts` and `db/drizzle.config.ts`
+load it explicitly, because neither Next nor drizzle-kit looks there on its own.
+
+If a required environment variable is missing, `pnpm build` fails and every dev-server request
+returns a 500 — both naming the variable. `.env.example` lists every one. No real credential
+ever belongs in the repository.
 
 ### The checks
 
@@ -245,7 +251,7 @@ Each must exit 0. Run them; do not assume they pass.
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | Biome, plus the stylesheet and migration checks Biome cannot do |
 | `pnpm test` | Vitest unit tests |
-| `pnpm test:e2e` | Playwright, against the dev server. Needs `pnpm exec playwright install chromium` once |
+| `pnpm test:e2e` | Playwright, against the dev server. Run `pnpm test:e2e:install` once first |
 | `pnpm supabase start` / `stop` | Brings the local stack up and down. Needs Docker |
 | `pnpm db:pull` | Regenerates `db/schema/` from the database, after a migration lands |
 

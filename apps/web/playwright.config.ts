@@ -11,7 +11,8 @@ export default defineConfig({
   reporter: process.env.CI ? 'list' : 'html',
   use: {
     baseURL: BASE_URL,
-    trace: 'on-first-retry',
+    // 'on-first-retry' never arms with retries: 0 — it captured nothing.
+    trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

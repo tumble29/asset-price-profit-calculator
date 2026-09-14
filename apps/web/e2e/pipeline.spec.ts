@@ -25,9 +25,16 @@ test('the styled component renders with its module styles applied', async ({ pag
   await expect(section).toHaveCSS('display', 'flex')
   await expect(section).toHaveCSS('flex-direction', 'column')
 
-  // 1.5rem = 24px, from the --spacing-gutter token declared in globals.css and
-  // resolved through the module's @reference. This is the assertion that fails
-  // if the reference is wrong.
+  // Assert the TOKEN reached :root, not merely that the computed value is 24px.
+  // `@apply gap-gutter` compiles to `gap: var(--spacing-gutter, 1.5rem)` with the
+  // fallback baked into the module chunk, so the computed value is 24px even when
+  // globals.css never loaded and the variable is empty. A wrong `@reference`
+  // fails `next build` outright; this is what catches the token going missing.
+  const token = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--spacing-gutter').trim(),
+  )
+  expect(token).toBe('1.5rem')
+
   await expect(section).toHaveCSS('gap', '24px')
   await expect(section).toHaveCSS('padding', '24px')
 })

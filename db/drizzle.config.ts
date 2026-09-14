@@ -1,4 +1,12 @@
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'drizzle-kit'
+
+// drizzle-kit bundles dotenv and resolves `<cwd>/.env` only, so the documented
+// root `.env.local` is invisible to it without this. See next.config.ts for why
+// fileURLToPath rather than .pathname.
+const rootEnv = fileURLToPath(new URL('../.env.local', import.meta.url))
+if (existsSync(rootEnv)) process.loadEnvFile(rootEnv)
 
 /**
  * Introspection only.

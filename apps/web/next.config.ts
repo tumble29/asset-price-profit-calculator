@@ -1,4 +1,25 @@
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import type { NextConfig } from 'next'
+
+/**
+ * Load the repository-root `.env.local`.
+ *
+ * Next only reads `.env.local` from the app directory, so the documented setup
+ * step — `cp .env.example .env.local` at the root — produced a file nothing
+ * read: the dev server started and then returned 500 on every request, and the
+ * build failed, both telling the reader to do the step they had just done.
+ * One file at the root is the thing being fixed; do not "fix" it by asking for
+ * a second copy under apps/web.
+ *
+ * `fileURLToPath`, not `.pathname`: pathname is percent-encoded, so a checkout
+ * path containing a space makes existsSync false and this silently does nothing.
+ *
+ * `process.loadEnvFile` does not override variables that are already set, so
+ * CI's `env:` block and a real deployment's configuration still win.
+ */
+const rootEnv = fileURLToPath(new URL('../../.env.local', import.meta.url))
+if (existsSync(rootEnv)) process.loadEnvFile(rootEnv)
 
 /**
  * Turbopack is Next 16's default for both `next dev` and `next build`, and this

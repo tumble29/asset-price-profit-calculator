@@ -9,54 +9,62 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs'
-import { readdir } from 'node:fs/promises'
-import { join, relative } from 'node:path'
+import { dirname, join, relative } from 'node:path'
+import { repoFiles } from './lib/repo-files.mjs'
 
-const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '')
-const SKIP = new Set(['node_modules', '.next', '.git', 'dist', 'coverage', '.supabase'])
+// import.meta.dirname, not new URL(...).pathname — see scripts/lib/repo-files.mjs.
+const ROOT = join(import.meta.dirname, '..')
+const FILES = repoFiles(ROOT)
 
 const failures = []
 
-// 1. No package script may invoke the forbidden drizzle-kit subcommands.
-async function packageJsonFiles(dir, out = []) {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      if (!SKIP.has(entry.name)) await packageJsonFiles(join(dir, entry.name), out)
-    } else if (entry.name === 'package.json') {
-      out.push(join(dir, entry.name))
-    }
+// 1. Nothing may invoke the forbidden drizzle-kit subcommands — not a package
+//    script, and not a workflow step, Makefile, shell script or git hook. The
+//    first version read package.json `scripts` only, which left every other
+//    place it can be called from invisible.
+//
+//    `--config <path>` between the binary and the subcommand is matched too: it
+//    is a working invocation, and the naive `drizzle-kit\s+(generate|push)`
+//    missed it.
+const FORBIDDEN = /drizzle-kit(?:\s+--?[\w-]+(?:[= ][^\s]+)?)*\s+(generate|push|migrate)\b/
+
+const SEARCHABLE = /\.(?:json|ya?ml|mjs|cjs|js|ts|mts|sh|bash|mk)$|^(?:Makefile|Justfile)$/
+
+for (const file of FILES) {
+  const name = file.split('/').pop() ?? ''
+  if (!SEARCHABLE.test(file) && !SEARCHABLE.test(name)) continue
+
+  let text
+  try {
+    text = readFileSync(file, 'utf8')
+  } catch {
+    continue // a listed-but-unreadable path (a broken symlink) is not our concern
   }
-  return out
-}
 
-const FORBIDDEN = /drizzle-kit\s+(generate|push|migrate)\b/
-
-for (const file of await packageJsonFiles(ROOT)) {
-  const scripts = JSON.parse(readFileSync(file, 'utf8')).scripts ?? {}
-  for (const [name, command] of Object.entries(scripts)) {
-    if (typeof command === 'string' && FORBIDDEN.test(command)) {
+  text.split('\n').forEach((line, i) => {
+    const hit = line.match(FORBIDDEN)
+    if (hit) {
       failures.push(
-        `${relative(ROOT, file)}: script "${name}" runs a forbidden drizzle-kit subcommand. ` +
+        `${relative(ROOT, file)}:${i + 1}: runs \`drizzle-kit ${hit[1]}\`. ` +
           'Migrations are hand-authored SQL in supabase/migrations (#3, D2); ' +
           'the typed layer is derived with `pnpm db:pull`.',
       )
     }
-  }
+  })
 }
 
 // 2. `supabase/migrations` must be the only migrations directory in the tree.
-async function migrationsDirs(dir, out = []) {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    if (!entry.isDirectory() || SKIP.has(entry.name)) continue
-    const full = join(dir, entry.name)
-    if (entry.name === 'migrations') out.push(full)
-    await migrationsDirs(full, out)
+//    Derived from the git file list, so a symlinked tree cannot slip past a
+//    directory walk that skips symlinks, and generated output cannot trip it.
+const expected = join(ROOT, 'supabase/migrations')
+const found = new Set()
+for (const file of FILES) {
+  for (let dir = dirname(file); dir.startsWith(ROOT) && dir !== ROOT; dir = dirname(dir)) {
+    if (dir.endsWith('/migrations')) found.add(dir)
   }
-  return out
 }
 
-const expected = join(ROOT, 'supabase/migrations')
-for (const dir of await migrationsDirs(ROOT)) {
+for (const dir of [...found].sort()) {
   if (dir !== expected) {
     failures.push(
       `${relative(ROOT, dir)}: a second migrations directory. ` +

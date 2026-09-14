@@ -9,6 +9,12 @@
  * `DATABASE_URL` is deliberately absent: it belongs to the database tooling in
  * `db/`, not to the app. `SUPABASE_SECRET_KEY` is validated on first use
  * instead of at startup, because it must never be required in a browser build.
+ *
+ * The completeness check is a type guard rather than a cast. #1 forbids a type
+ * assertion to silence a type error, and a cast here would be exactly that: it
+ * would let the runtime check be deleted while `tsc` stayed green. With the
+ * guard, deleting the check fails to compile, so the type and the check cannot
+ * drift apart.
  */
 
 const REQUIRED_PUBLIC = [
@@ -27,30 +33,25 @@ const publicEnv: Record<PublicVar, string | undefined> = {
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 }
 
-function readPublicEnv(): Record<PublicVar, string> {
-  const missing = REQUIRED_PUBLIC.filter((name) => {
-    const value = publicEnv[name]
+function missingFrom(raw: Record<PublicVar, string | undefined>): PublicVar[] {
+  return REQUIRED_PUBLIC.filter((name) => {
+    const value = raw[name]
     return value === undefined || value === ''
   })
+}
 
-  if (missing.length > 0) {
+function isComplete(raw: Record<PublicVar, string | undefined>): raw is Record<PublicVar, string> {
+  return missingFrom(raw).length === 0
+}
+
+function readPublicEnv(): Record<PublicVar, string> {
+  if (!isComplete(publicEnv)) {
     throw new Error(
-      `Missing required environment variable(s): ${missing.join(', ')}. ` +
+      `Missing required environment variable(s): ${missingFrom(publicEnv).join(', ')}. ` +
         'Copy .env.example to .env.local and fill them in; `pnpm supabase start` prints the values.',
     )
   }
-
-  const entries = REQUIRED_PUBLIC.map((name) => {
-    const value = publicEnv[name]
-    if (value === undefined) {
-      // Unreachable: `missing` above has already thrown. Kept so the narrowing
-      // is a real check rather than a non-null assertion, which #1 forbids.
-      throw new Error(`Environment variable ${name} became undefined after validation.`)
-    }
-    return [name, value] as const
-  })
-
-  return Object.fromEntries(entries) as Record<PublicVar, string>
+  return { ...publicEnv }
 }
 
 export const env = readPublicEnv()
