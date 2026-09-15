@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Each push to main gets its own group, so two close merges cannot leave the
+# earlier commit with no completed run. Pull requests still cancel per-ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
+  cancel-in-progress: true
+
+# Nothing here reads a secret or a private registry. contents:read rather than
+# {} because checkout needs it on a private repository.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # Biome, plus the two checks it cannot do: Biome does not parse SCSS at
+      # all, and a missing Tailwind `@reference` does not reliably fail the
+      # build. See scripts/check-stylesheets.mjs.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test
+
+      # A full `next build` on Turbopack. This is the only thing that catches
+      # the Tailwind/CSS-Modules purity failure, so it stays in CI even though
+      # #3 scoped CI to typecheck, lint and unit tests.
+      - name: Build
+        run: pnpm build
+        env:
+          # Placeholders. The build only needs these to be present — src/lib/env.ts
+          # fails at startup naming any that are missing, which is the behaviour
+          # #3's acceptance criteria require.
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+
+      # `next build` rewrites tsconfig.json on its first run in a fresh tree.
+      # Both it and next-env.d.ts are committed or ignored deliberately, so a
+      # dirty tree here means something regenerated differently than expected.
+      # `git diff` alone sees neither untracked nor staged files, so a newly
+      # generated file would have passed this silently. --intent-to-add makes
+      # new files show up as diffs, which keeps the diff output a bare path
+      # list would lose. Nothing generates an untracked file today, but
+      # db/schema/ is about to start being written by `pnpm db:pull`.
+      - name: Working tree is clean after build
+        run: |
+          git add --all --intent-to-add
+          git diff --exit-code
