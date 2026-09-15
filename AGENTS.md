@@ -17,7 +17,7 @@ product name.
 | **Issue #1** — `tumble29/asset-price-profit-calculator#1` | What is the state of the project, what has been decided, and what is still open |
 | `README.md` | What the product is, for a human arriving cold |
 | `.github/ISSUE_AUTHORING.md` | How work is picked up, and how an issue is written |
-| `CLAUDE.md` | Code conventions — how to write code in this repository |
+| `CLAUDE.md` | Code conventions **and the working process** — how to write code here, and how a change reaches `main` |
 
 **Issue #1 is the source of truth for decisions.** Where anything else disagrees with it, #1
 wins and the other document is stale.
@@ -92,50 +92,20 @@ a missed poll and a flat market become indistinguishable and the gap is permanen
 
 ---
 
-## Branching
+## Branching and working conventions
 
-`main` is the trunk. **Never commit directly to it** — not even for a one-line fix. Review is
-where a wrong assumption gets caught, and a direct commit skips it silently.
+Both live in `CLAUDE.md` under *Process*, in full: the trunk rule, a branch per issue, one pull
+request per issue with `Closes #N` in the body, who merges it and when, the branch deleted
+afterwards, and how to raise what you notice without silently fixing it or silently skipping it.
 
-Work on a branch per issue, named `issue-<number>-<short-slug>` (`issue-11-quotes-schema`), and
-open a pull request against `main`. One pull request per issue.
+**Read `CLAUDE.md` before you start.** It is short, and it is the file those rules live in —
+they are deliberately not repeated here. Two hand-maintained copies drift silently, and each
+tool reads only one of the two files, so nothing catches it (#18).
 
-*Exception:* if your session was launched with a branch already designated for you, use that one
-and name the issue in the pull request instead.
+Full detail — dependency verification, claiming, what to call your session — is in
+`.github/ISSUE_AUTHORING.md` under *Working an issue* and *Naming your session*. The rest —
+the styling rules, the type and error-handling rules, the design brief convention — is in #1
+under *Engineering non-negotiables* and *Workflows*.
 
-The pull request carries the code, issue #1's board row, and any decision that got made — all in
-the same change. Put `Closes #N` in the body. **Do not merge it yourself and do not swap the
-label to `status-done` when it opens** — that happens on merge, once the owner has said so.
-An issue marked done while its pull request is still open lets the next agent build against code
-that is not on `main` yet.
-
-Do not rewrite history on a branch you have already pushed; add a commit instead. Delete the
-branch after merge.
-
-Full detail in `.github/ISSUE_AUTHORING.md` under *Branching and pull requests*.
-
----
-
-## Working conventions
-
-- **Explore widely, report freely, change narrowly.** The limit is on what you change unasked —
-  never on what you may read, notice or propose.
-- **Raise what you spot in the session, and propose the fix — do not just point at it.** Small,
-  and in code this issue already touches: say what you would do, and ask whether to fold it in.
-  Anything with its own acceptance criteria: propose it as a new issue. The owner decides. Never
-  silently fix it and never silently skip it — a silent fix buries the real change in review
-  noise, and a silent skip means only you ever knew.
-- **Before finishing, write down anything raised and still unanswered.** The session is where the
-  owner reads it; a comment on the issue is what survives the session ending.
-- **If something is ambiguous, or reality does not match the issue** — a tool behaves
-  differently, a version has moved on, a documented step does not work — say so and stop.
-  Guessing is the expensive option here.
-- **Decisions marked DEFERRED in #1 are not yours to make.** Post a recommendation with your
-  reasoning and wait.
-- **When a decision does get made**, write it into the issue and #1's decision log *before* any
-  code is written. A decision that lives only in a session transcript is a decision that
-  evaporates.
-- **Commit messages reference their issue** as `tumble29/asset-price-profit-calculator#N`.
-
-The rest — the styling rules, the type and error-handling rules, the design brief convention —
-is in #1 under *Engineering non-negotiables* and *Workflows*.
+**Adding a second agent instruction file?** Do not hand-copy this one — see #18 (D2) for the
+mechanism that keeps a file set in sync. Hand-copying is how this repository got here.

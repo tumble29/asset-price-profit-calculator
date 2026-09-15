@@ -157,11 +157,15 @@ No vendor sells you yesterday's dealer quote.
 - **A branch per issue, named `issue-<number>-<short-slug>`, arriving through one pull request.**
   If your tooling designated a branch for you, use that one and name the issue in the pull
   request instead.
+- **One pull request per issue.**
+- **Put `Closes #N` in the pull request body.**
 - **Commit messages reference their issue** as `tumble29/asset-price-profit-calculator#N`.
 - **Do not rewrite history on a branch you have already pushed.** Add a commit instead.
+- **Do not merge it yourself** — that happens on merge, once the owner has said so.
 - **On merge, the code, the issue's status label and #1's board row all move together.** Not
   before: an issue marked done while its pull request is still open lets the next agent build
   against code that is not on `main` yet.
+- **Delete the branch after merge.**
 - **Explore widely, report freely, change narrowly.** The limit is on what you change unasked —
   never on what you may read, notice or propose.
 - **Raise what you spot in the session, and propose the fix — do not just point at it.** Small,
