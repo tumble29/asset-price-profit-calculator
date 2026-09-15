@@ -67,6 +67,12 @@ Two fixes that look correct and are not:
   bypasses, because `object_ownercheck()` ends in `has_privs_of_role()`, which traverses role
   inheritance. It would pass a naive audit.
 
+`ALTER TABLE … FORCE ROW LEVEL SECURITY` closes the second mechanism — verified on PostgreSQL
+16.13 for both reads and writes, for the owner and for roles inheriting from it. It does **not**
+touch the first. `postgres` still holds `BYPASSRLS`, so `FORCE` changes nothing at all for the
+`DATABASE_URL` above, and it is never a substitute for the application role below. It is worth
+having on user-owned tables as defence in depth, not as the fix.
+
 PostgREST — and therefore `supabase-js` with a user's JWT — is exposed to neither: it connects as
 `authenticator`, which has no `BYPASSRLS` and owns nothing, then switches role per request.
 

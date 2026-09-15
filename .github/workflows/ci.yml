@@ -5,13 +5,21 @@ on:
   push:
     branches: [main]
 
+# Each push to main gets its own group, so two close merges cannot leave the
+# earlier commit with no completed run. Pull requests still cancel per-ref.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
   cancel-in-progress: true
+
+# Nothing here reads a secret or a private registry. contents:read rather than
+# {} because checkout needs it on a private repository.
+permissions:
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -51,5 +59,12 @@ jobs:
       # `next build` rewrites tsconfig.json on its first run in a fresh tree.
       # Both it and next-env.d.ts are committed or ignored deliberately, so a
       # dirty tree here means something regenerated differently than expected.
+      # `git diff` alone sees neither untracked nor staged files, so a newly
+      # generated file would have passed this silently. --intent-to-add makes
+      # new files show up as diffs, which keeps the diff output a bare path
+      # list would lose. Nothing generates an untracked file today, but
+      # db/schema/ is about to start being written by `pnpm db:pull`.
       - name: Working tree is clean after build
-        run: git diff --exit-code
+        run: |
+          git add --all --intent-to-add
+          git diff --exit-code

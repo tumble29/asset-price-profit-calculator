@@ -21,7 +21,7 @@ describe('message catalogue', () => {
     }
   })
 
-  it('has no empty or untranslated-looking message', () => {
+  it('has no empty message', () => {
     for (const locale of locales) {
       for (const [key, value] of Object.entries(catalogue[locale])) {
         expect(value.trim(), `${locale}/${key}`).not.toBe('')

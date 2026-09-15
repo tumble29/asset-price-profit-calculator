@@ -57,7 +57,7 @@ Node 24 (see `.nvmrc`), pnpm 10, and Docker for the local Supabase stack.
 | `pnpm typecheck` | Types. Must exit 0 |
 | `pnpm lint` | Biome, plus the stylesheet and migration checks Biome cannot do. Must exit 0 |
 | `pnpm test` | Vitest unit tests. Must exit 0 |
-| `pnpm test:e2e` | Playwright, against the dev server. Must exit 0 |
+| `pnpm test:e2e` | Playwright. Starts its own dev server on port 3100, never reusing one it did not start. Must exit 0 |
 | `pnpm build` | Production build, on Turbopack. Must exit 0 |
 | `pnpm db:pull` | Regenerates `db/schema/` from the database, after a migration lands |
 

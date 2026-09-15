@@ -251,7 +251,7 @@ Each must exit 0. Run them; do not assume they pass.
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | Biome, plus the stylesheet and migration checks Biome cannot do |
 | `pnpm test` | Vitest unit tests |
-| `pnpm test:e2e` | Playwright, against the dev server. Run `pnpm test:e2e:install` once first |
+| `pnpm test:e2e` | Playwright. Starts its own dev server on port 3100. Run `pnpm test:e2e:install` once first |
 | `pnpm supabase start` / `stop` | Brings the local stack up and down. Needs Docker |
 | `pnpm db:pull` | Regenerates `db/schema/` from the database, after a migration lands |
 

@@ -146,10 +146,15 @@ for (const file of stylesheets) {
   // so it survives the file moving.
   if (/@import\s+["']tailwindcss["']/.test(code)) continue
 
-  if (!code.includes(REQUIRED_REFERENCE)) {
-    fail(file, 0, `contains @apply but not ${REQUIRED_REFERENCE}`)
-  }
   const bare = code.match(/@reference\s+["']tailwindcss["']/)
+  if (!code.includes(REQUIRED_REFERENCE) && !bare) {
+    // Single quotes, a stray double space and a relative path all compile and
+    // resolve the token, so "not present" would be a misleading thing to say.
+    const message = /@reference\b/.test(code)
+      ? `has an @reference, but not in the required form. Write exactly ${REQUIRED_REFERENCE}`
+      : `contains @apply but not ${REQUIRED_REFERENCE}`
+    fail(file, 0, message)
+  }
   if (bare) {
     fail(
       file,
@@ -267,7 +272,10 @@ for (const file of markup) {
 //    Named colours are matched only in declaration VALUES. Matching them as bare
 //    identifiers false-fails on `.gold-tier`, `tan(45deg)` and `--color-gold`.
 // ---------------------------------------------------------------------------
-const HEX = /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/
+// The lookahead skips id selectors (`#feed {`, `#face {`). Requiring a ':' on
+// the same line instead would miss every continuation line of a multi-line
+// linear-gradient(...), which is where real colours hide.
+const HEX = /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b(?![^;{}]*\{)/
 const COLOUR_FN = /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color-mix|color)\s*\(/i
 const COLOUR_UTILITY =
   /\b(?:text|bg|border|ring|outline|decoration|divide|accent|caret|shadow|fill|stroke|placeholder|from|via|to)-(?:[a-z]+-\d{2,3}|black|white)\b/
